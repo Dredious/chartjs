@@ -1,2 +1,2 @@
 # chartjs
-For SQm Sensors
+For SQM Sensors
