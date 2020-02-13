@@ -11,13 +11,6 @@ mongo = PyMongo(app)
 @app.route("/", methods=['GET'])
 def index():
     return render_template("index.html")
-    # devices = mongo.db.all_packets.distinct("device_id")
-    
-    # output = []
-    # for q in devices.find():
-    #     output.append({'device_id': q['device_id']})
-
-    # return jsonify({'result' : devices})
 
 
 @app.route("/devices", methods=['GET'])
@@ -37,6 +30,16 @@ def get_device(device_id):
 
     output = []
     for q in devices.find({'device_id' : device_id}):
+        output.append({'device_id': q['device_id'], 'SQM_Value' : q['SQM_Value'], 'amp_temp' : q['amb_temp'], 'sky_temp' : q['sky_temp'], 'time' : q['time']})
+
+    return jsonify({'result' : output})
+
+@app.route("/device_data", methods=['GET']) #Dangerous, too much data.
+def get_device_data():
+    devices = mongo.db.all_packets
+
+    output = []
+    for q in devices.find({}):
         output.append({'device_id': q['device_id'], 'SQM_Value' : q['SQM_Value'], 'amp_temp' : q['amb_temp'], 'sky_temp' : q['sky_temp'], 'time' : q['time']})
 
     return jsonify({'result' : output})

@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <style>
+        #myBtn {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 30px;
+            z-index: 99;
+            font-size: 18px;
+            border: none;
+            outline: none;
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        #myBtn:hover {
+            background-color: #555;
+        }
+        .panel-resizable {
+            resize: vertical;
+            overflow: auto;
+        }
+    </style>
     <!-- Popper JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <!-- jQuery library -->
@@ -19,17 +44,28 @@
     
     <title>Document</title>
 </head>
-<body>
-    <div class="container-fluid">
-        <div class="container" id="chart-container" class="chart-container" style="position: relative; height:40vh; width:80vw">
+<body style="padding-top: 70px; ">
+
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+    <nav class="navbar fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <select id="sensors" onchange="location = this.value;">
+                <option value="#index.html">Select a Graph...</option>
+            </select>
+            
         </div>
-    </div>
+        <h4><span class="badge badge-secondary" id="sensor_count"></span></h4>
+      </nav>
+ 
+      </div>
+    
+    <div class="container" id="chart-container" class="chart-container" style="position: relative; height:40vh; width:80vw">
+        
+    <div>
 
     <script>
        
-
-        //fetchDevices();
-        //chartIt();
         fetchSQMData()
         .catch(error => {
             console.log('Error!');
@@ -91,25 +127,41 @@
         };
         
         let chart_container = document.getElementById("chart-container");
+        let sensor_list = document.getElementById("sensors");
         async function fetchSQMData(){
+            let counter = 0;
             const response = await fetch('http://192.168.50.135:5000/devices');
             const data = await response.json();
             //console.log(data);
             data.result.forEach(data => {
+                counter++;
                 loadData(data)
                 .catch(error => {
                     console.log('Error!');
                     console.log(error);
                 });
-                let title = document.createElement('h3');
-                title.innerHTML = data;
+
+                let option = document.createElement('option');
+                option.value = "#"+data;
+                option.innerHTML = data;
+                sensor_list.appendChild(option);
+
+                let anchor = document.createElement('a');
+                anchor.name = data;
+
+                let title = document.createElement('h1');
+                title.innerHTML = data + " #"+ counter;
                 title.setAttribute("class", "badge badge-secondary");
+
                 let newCanvas = document.createElement("canvas");
                 newCanvas.setAttribute('id', data)
-                chart_container.append(title);
+                newCanvas.setAttribute('class', 'shadow-sm p-3 mb-5 bg-white rounded')
+                chart_container.appendChild(anchor);
+                chart_container.appendChild(title);
                 chart_container.appendChild(newCanvas);
 
-            });   
+            });  
+            document.getElementById('sensor_count').innerHTML = "Sensor Count: "+counter;
         }
 
         async function loadData(device_id){
@@ -131,8 +183,21 @@
             });
         }
 
+        var mybutton = document.getElementById("myBtn");
 
+        window.onscroll = function() {scrollFunction()};
 
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
 
     </script>   
 
